@@ -1,0 +1,84 @@
+<!-- graficas.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resumen de Desempeño</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="datos_notas.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; background-color: #f3f4f6; }
+    h1 { text-align: center; margin-bottom: 2rem; }
+    .chart-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+    canvas { background: #fff; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+  <h1>Resumen de Materias Reprobadas por Grupo</h1>
+  <div class="chart-container" id="charts"></div>
+
+  <script>
+    function contarMateriasPerdidasPorGrupo(grupo) {
+      const estudiantes = datosNotas[grupo];
+      const conteo = {};
+
+      estudiantes.forEach(est => {
+        Object.entries(est).forEach(([materia, nota]) => {
+          if (materia === "Estudiante") return;
+          if (nota === "DBJ") {
+            conteo[materia] = (conteo[materia] || 0) + 1;
+          }
+        });
+      });
+
+      return conteo;
+    }
+
+    const grupos = ["1101", "1102", "1103", "1104", "1105"];
+    const chartsContainer = document.getElementById("charts");
+
+    grupos.forEach(grupo => {
+      const canvas = document.createElement("canvas");
+      canvas.id = `chart-${grupo}`;
+      chartsContainer.appendChild(canvas);
+
+      const data = contarMateriasPerdidasPorGrupo(grupo);
+      const labels = Object.keys(data);
+      const values = Object.values(data);
+
+      new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: `Grupo ${grupo}`,
+            data: values,
+            backgroundColor: 'rgba(255, 99, 132, 0.6)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: `Grupo ${grupo} - Materias Reprobadas`
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Cantidad de estudiantes'
+              }
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
