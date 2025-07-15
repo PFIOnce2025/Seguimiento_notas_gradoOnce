@@ -29,12 +29,8 @@
       if (!visible) return null;
 
       const archivos = {
-        Física: {
-          doc: "mejoramiento_fisica.pdf"
-        },
-        Quimica: {
-          doc: "mejoramiento_quimica.docx"
-        }
+        Física: { doc: "mejoramiento_fisica.pdf" },
+        Quimica: { doc: "mejoramiento_quimica.docx" }
       };
 
       const recursos = archivos[materia];
@@ -54,7 +50,7 @@
                 )}
                 {recursos.doc && (
                   <a href={recursos.doc} download className="block text-blue-600 hover:underline">
-                    📄 Descargar Guía (DOC)
+                    📄 Descargar Guía ({recursos.doc.split('.').pop().toUpperCase()})
                   </a>
                 )}
               </div>
@@ -78,7 +74,7 @@
       return (
         <div className="mt-6 p-6 bg-white rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold mb-4 text-gray-800">Calificaciones de {student}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {Object.entries(grades).map(([materia, nota]) => {
               if (materia === "Estudiante") return null;
 
@@ -157,12 +153,15 @@
       return (
         <div className="max-w-4xl mx-auto p-6">
           <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Consulta de Calificaciones</h1>
-              <button
-      onClick={() => window.open('graficas.html', '_blank')}
-      className="mb-6 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 block mx-auto"
-    >
-      Ver Resumen Gráfico por Grupo
-    </button>
+
+          {/* BOTÓN PARA ABRIR GRÁFICAS */}
+          <button
+            onClick={() => window.open('graficas.html', '_blank')}
+            className="mb-6 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 block mx-auto"
+          >
+            Ver Resumen Gráfico por Grupo
+          </button>
+
           <div className="flex flex-col space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">Seleccionar Grupo:</label>
