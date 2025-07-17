@@ -56,7 +56,7 @@
                 )}
                 {recursos.doc && (
                   <a href={recursos.doc} download className="block text-blue-600 hover:underline">
-                    📄 Descargar Guía (PDF)
+                    📄 Descargar Guía (DOC)
                   </a>
                 )}
               </div>
@@ -76,38 +76,33 @@
 
     const GradeDisplay = ({ student, grades, onMateriaClick }) => {
       const materiasReprobadas = Object.values(grades).filter(nota => nota === "DBJ").length;
+      const materiasTotales = Object.keys(grades).filter(m => m !== "Estudiante").length;
+      const materiasAprobadas = materiasTotales - materiasReprobadas;
 
       React.useEffect(() => {
-        const totalMaterias = Object.keys(grades).filter(m => m !== "Estudiante").length;
-        const aprobadas = totalMaterias - materiasReprobadas;
-        const reprobadas = materiasReprobadas;
+        const ctx = document.getElementById("chartCanvas");
+        if (!ctx) return;
 
-        const ctx = document.getElementById("chart-porcentaje").getContext("2d");
-
-        if (window.chartInstance) {
-          window.chartInstance.destroy();
-        }
-
-        window.chartInstance = new Chart(ctx, {
-          type: "doughnut",
+        const chart = new Chart(ctx, {
+          type: 'doughnut',
           data: {
-            labels: ["Aprobadas", "Reprobadas"],
+            labels: ['Aprobadas', 'Reprobadas'],
             datasets: [{
-              label: "Materias",
-              data: [aprobadas, reprobadas],
-              backgroundColor: ["#4ade80", "#f87171"],
-              hoverOffset: 4
+              data: [materiasAprobadas, materiasReprobadas],
+              backgroundColor: ['#10B981', '#EF4444']
             }]
           },
           options: {
+            responsive: true,
             plugins: {
               legend: {
-                display: true,
-                position: "bottom"
+                position: 'bottom'
               }
             }
           }
         });
+
+        return () => chart.destroy();
       }, [grades]);
 
       return (
@@ -116,9 +111,11 @@
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Object.entries(grades).map(([materia, nota]) => {
               if (materia === "Estudiante") return null;
+
               const isDBJ = nota === "DBJ";
               const cardStyle = isDBJ ? "bg-red-100 border border-red-400 cursor-pointer hover:bg-red-200" : "bg-gray-50";
               const textStyle = isDBJ ? "text-red-600 font-semibold" : "text-gray-600";
+
               return (
                 <div
                   key={materia}
@@ -131,9 +128,11 @@
               );
             })}
           </div>
-          <div className="mt-6">
-            <p className="text-lg font-semibold">Resumen:</p>
-            <canvas id="chart-porcentaje" width="200" height="200"></canvas>
+          <div className="mt-6 flex flex-col items-center">
+            <canvas id="chartCanvas" width="200" height="200"></canvas>
+            <div className="mt-4 text-sm text-gray-700">
+              ✅ Aprobadas: <strong>{materiasAprobadas}</strong> | ❌ Reprobadas: <strong>{materiasReprobadas}</strong> | 📘 Total: <strong>{materiasTotales}</strong>
+            </div>
           </div>
         </div>
       );
@@ -189,14 +188,6 @@
       return (
         <div className="max-w-4xl mx-auto p-6">
           <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Consulta de Calificaciones</h1>
-
-          <button
-            onClick={() => window.open('graficas.html', '_blank')}
-            className="mb-6 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 block mx-auto"
-          >
-            Ver Resumen Gráfico por Grupo
-          </button>
-
           <div className="flex flex-col space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">Seleccionar Grupo:</label>
